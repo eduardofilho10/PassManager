@@ -1,5 +1,6 @@
 import React from 'react';
 import { Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
 import { RFValue } from 'react-native-responsive-fontsize';
 import * as Yup from 'yup';
@@ -36,15 +37,42 @@ export function RegisterLoginData() {
     formState: {
       errors
     }
-  } = useForm();
+  } = useForm({
+    resolver: yupResolver(schema)
+  });
 
+  const navigation = useNavigation();
   async function handleRegister(formData: FormData) {
+
     const newLoginData = {
       id: String(uuid.v4()),
       ...formData
     }
+    // console.log(newLoginData);
 
     // Save data on AsyncStorage
+    try {
+      const dataKey = '@passmanager:logins';
+
+      const data = await AsyncStorage.getItem(dataKey);
+      const currentData = data ? JSON.parse(data) : [];
+      //console.log(currentData);
+
+      const dataFormatted = [
+        ...currentData,
+        newLoginData
+      ];
+
+      await AsyncStorage.setItem(dataKey, JSON.stringify(dataFormatted));
+
+      reset();
+
+      navigation.navigate('Home');
+
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Não foi possivel salvar");
+    }
   }
 
   return (
@@ -60,9 +88,7 @@ export function RegisterLoginData() {
           <Input
             title="Título"
             name="title"
-            error={
-              // message error here
-            }
+            error={errors.title && errors.title.message}
             control={control}
             placeholder="Escreva o título aqui"
             autoCapitalize="sentences"
@@ -71,9 +97,7 @@ export function RegisterLoginData() {
           <Input
             title="Email"
             name="email"
-            error={
-              // message error here
-            }
+            error={errors.email && errors.email.message}
             control={control}
             placeholder="Escreva o Email aqui"
             autoCorrect={false}
@@ -83,9 +107,7 @@ export function RegisterLoginData() {
           <Input
             title="Senha"
             name="password"
-            error={
-              // message error here
-            }
+            error={errors.password && errors.password.message}
             control={control}
             secureTextEntry
             placeholder="Escreva a senha aqui"

@@ -35,3 +35,9 @@ export const EmptyListMessage = styled.Text`
   font-family: 'Poppins_500Medium';
   color: #9883BF;
 `;
+
+export const LoadContainer = styled.View`
+        flex: 1;
+        justify-content: center;
+        align-items:center;
+`;

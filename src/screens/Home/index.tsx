@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { ActivityIndicator } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -9,7 +10,8 @@ import {
   Container,
   LoginList,
   EmptyListContainer,
-  EmptyListMessage
+  EmptyListMessage,
+  LoadContainer
 } from './styles';
 
 interface LoginDataProps {
@@ -22,11 +24,21 @@ interface LoginDataProps {
 type LoginListDataProps = LoginDataProps[];
 
 export function Home() {
-  // const [searchListData, setSearchListData] = useState<LoginListDataProps>([]);
-  // const [data, setData] = useState<LoginListDataProps>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchListData, setSearchListData] = useState<LoginListDataProps>([]);
+  const [data, setData] = useState<LoginListDataProps>([]);
+
 
   async function loadData() {
     // Get asyncStorage data, use setSearchListData and setData
+    const dataKey = '@passmanager:logins';
+    const response = await AsyncStorage.getItem(dataKey);
+    const Dados = response ? JSON.parse(response) : [];
+
+    //console.log(Dados);
+    setSearchListData(Dados);
+    setData(Dados);
+    setIsLoading(false);
   }
   useEffect(() => {
     loadData();
@@ -46,23 +58,31 @@ export function Home() {
         placeholder="Pesquise pelo nome do serviço"
         onChangeText={(value) => handleFilterLoginData(value)}
       />
+      
+      {isLoading ?
+        <LoadContainer>
+          <ActivityIndicator  size="small" color="#ffffff" />
+        </LoadContainer> :
+        
+        <LoginList
+          keyExtractor={(item) => item.id}
+          data={searchListData}
+          ListEmptyComponent={(
+            <EmptyListContainer>
+              <EmptyListMessage>Nenhum item a ser mostrado</EmptyListMessage>
+            </EmptyListContainer>
+          )}
+          renderItem={({ item: loginData }) => {
+            return <LoginDataItem
+              title={loginData.title}
+              email={loginData.email}
+              password={loginData.password}
+            />
+          }}
+        />
 
-      <LoginList
-        keyExtractor={(item) => item.id}
-        data={searchListData}
-        ListEmptyComponent={(
-          <EmptyListContainer>
-            <EmptyListMessage>Nenhum item a ser mostrado</EmptyListMessage>
-          </EmptyListContainer>
-        )}
-        renderItem={({ item: loginData }) => {
-          return <LoginDataItem
-            title={loginData.title}
-            email={loginData.email}
-            password={loginData.password}
-          />
-        }}
-      />
+      }
+
     </Container>
   )
 }

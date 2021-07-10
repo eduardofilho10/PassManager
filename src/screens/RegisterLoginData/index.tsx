@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+//import { useNavigation } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
 import { RFValue } from 'react-native-responsive-fontsize';
 import * as Yup from 'yup';
@@ -41,7 +41,8 @@ export function RegisterLoginData() {
     resolver: yupResolver(schema)
   });
 
-  const navigation = useNavigation();
+  //const navigation = useNavigation();
+
   async function handleRegister(formData: FormData) {
 
     const newLoginData = {
@@ -67,7 +68,7 @@ export function RegisterLoginData() {
 
       reset();
 
-      navigation.navigate('Home');
+      //navigation.navigate('Home');
 
     } catch (error) {
       console.log(error);

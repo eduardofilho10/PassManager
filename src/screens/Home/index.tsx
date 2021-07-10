@@ -50,6 +50,13 @@ export function Home() {
 
   function handleFilterLoginData(search: string) {
     // Filter results inside data, save with setSearchListData
+    //console.log(search);
+    if (!search) {
+      return setSearchListData(data);
+    }
+    
+    const result = data.filter(item => item.title.includes(search));
+    setSearchListData(result);
   }
 
   return (
